@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOXI ETS Carbon Returns Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.w{font-family:'Lato',sans-serif;background:#0f1a16;color:#fff;padding:48px 36px;width:100%;min-height:100vh;}
+.tag{font-family:'Raleway',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:#CFAF50;display:block;margin-bottom:12px;}
+.ttl{font-family:'Raleway',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:10px;}
+.client-name{font-family:'Raleway',sans-serif;font-size:16px;font-weight:700;color:#CFAF50;margin-bottom:6px;display:none;}
+.div{width:48px;height:3px;background:#CFAF50;margin-bottom:24px;}
+.sub{color:rgba(255,255,255,0.55);font-size:14px;line-height:1.7;margin-bottom:32px;}
+.card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(207,175,80,0.2);border-radius:8px;padding:28px;margin-bottom:20px;}
+.lbl{font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#CFAF50;display:block;margin-bottom:8px;}
+.inp-hdr{display:grid;grid-template-columns:2.5fr 1.5fr 1.2fr 36px 36px;gap:8px;margin-bottom:4px;align-items:center;}
+.inp-hdr span{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.inp-hdr span.center{text-align:center;}
+.inp-row{display:grid;grid-template-columns:2.5fr 1.5fr 1.2fr 36px 36px;gap:8px;align-items:center;margin-bottom:8px;transition:opacity 0.2s;}
+.inp-row.hidden-row{opacity:0.25;}
+select,input[type=number]{background:rgba(255,255,255,0.07);border:0.5px solid rgba(207,175,80,0.3);border-radius:4px;color:#fff;font-size:12px;padding:7px 8px;width:100%;outline:none;font-family:'Lato',sans-serif;}
+select option{background:#1a2420;color:#fff;}
+.btn-eye{background:none;border:0.5px solid rgba(255,255,255,0.15);border-radius:4px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.15s;}
+.btn-eye:hover{border-color:rgba(207,175,80,0.5);}
+.btn-eye.eye-off{border-color:rgba(255,255,255,0.08);}
+.btn-del{background:none;border:0.5px solid rgba(255,255,255,0.15);border-radius:4px;color:rgba(255,255,255,0.4);font-size:16px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btn-del:hover{color:#D85A30;border-color:rgba(216,90,48,0.4);}
+.btn-add{background:rgba(207,175,80,0.1);border:0.5px solid rgba(207,175,80,0.4);border-radius:4px;color:#CFAF50;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:8px 16px;cursor:pointer;font-family:'Lato',sans-serif;margin-top:4px;}
+.ctrl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+.ctrl-card{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 14px;}
+.ctrl-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#CFAF50;display:block;margin-bottom:6px;}
+.region-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px;}
+.stat{background:rgba(255,255,255,0.05);border:0.5px solid rgba(207,175,80,0.12);border-radius:6px;padding:12px 10px;}
+.slbl{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;}
+.snum{font-size:18px;font-weight:800;font-family:'Raleway',sans-serif;color:#CFAF50;}
+.snum.neg{color:#D85A30;}
+.ssub{font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px;}
+.sec{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:20px 0 8px;}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;}
+.legend span{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.4);}
+.lsq{width:10px;height:10px;border-radius:2px;}
+.chart-wrap{position:relative;width:100%;}
+.export-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.btn-export{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:'Lato',sans-serif;display:flex;align-items:center;gap:8px;border:none;}
+.btn-csv{background:rgba(93,202,165,0.12);border:0.5px solid rgba(93,202,165,0.4)!important;color:#5DCAA5;}
+.btn-pdf{background:rgba(207,175,80,0.12);border:0.5px solid rgba(207,175,80,0.4)!important;color:#CFAF50;}
+.btn-csv:hover{background:rgba(93,202,165,0.2);}
+.btn-pdf:hover{background:rgba(207,175,80,0.2);}
+.inv-tbl-wrap{overflow-x:auto;margin-top:8px;}
+.inv-tbl{border-collapse:collapse;font-size:11px;font-family:'Lato',sans-serif;min-width:900px;width:100%;}
+.inv-tbl th{padding:5px 8px;text-align:right;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;border-bottom:1px solid rgba(207,175,80,0.3);white-space:nowrap;background:rgba(207,175,80,0.06);}
+.inv-tbl th:first-child{text-align:left;min-width:180px;}
+.inv-tbl td{padding:4px 8px;text-align:right;border-bottom:0.5px solid rgba(255,255,255,0.04);white-space:nowrap;font-size:11px;}
+.inv-tbl td:first-child{text-align:left;color:rgba(255,255,255,0.5);font-size:10px;}
+.inv-tbl tr.section-hdr td{background:rgba(207,175,80,0.08);color:rgba(255,255,255,0.6);font-weight:700;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-top:1px solid rgba(207,175,80,0.2);}
+.inv-tbl tr.total-row td{background:rgba(207,175,80,0.05);font-weight:700;border-top:1px solid rgba(207,175,80,0.25);border-bottom:1px solid rgba(207,175,80,0.25);color:rgba(255,255,255,0.85);}
+.inv-tbl tr.total-row td:first-child{color:rgba(255,255,255,0.7);}
+.inv-tbl tr.net-row td,.inv-tbl tr.cum-row td{font-weight:700;}
+.inv-tbl tr.net-row td:first-child,.inv-tbl tr.cum-row td:first-child{color:rgba(255,255,255,0.7);}
+.inv-tbl .pos{color:#CFAF50;}.inv-tbl .neg{color:#D85A30;}.inv-tbl .zero{color:rgba(255,255,255,0.25);}
+.inv-tbl tr.spacer td{height:6px;background:transparent;border:none;}
+.itr-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
+.itr-card{background:rgba(207,175,80,0.06);border:0.5px solid rgba(207,175,80,0.2);border-radius:6px;padding:12px 16px;}
+.itr-lbl{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.itr-val{font-size:16px;font-weight:800;font-family:'Raleway',sans-serif;color:#CFAF50;}
+.disclaim{font-size:11px;color:rgba(255,255,255,0.22);margin-top:20px;line-height:1.7;}
+.prefilled-banner{background:rgba(207,175,80,0.08);border:0.5px solid rgba(207,175,80,0.3);border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:rgba(255,255,255,0.6);display:none;}
+.prefilled-banner strong{color:#CFAF50;}
+@media(max-width:640px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .ctrl-row{grid-template-columns:1fr 1fr;}
+  .region-row{grid-template-columns:1fr;}
+  .w{padding:32px 18px;}
+}
+</style>
+</head>
+<body>
+<div class="w">
+  <span class="tag">Investment analysis</span>
+  <div class="client-name" id="client-name"></div>
+  <div class="ttl">ETS carbon returns</div>
+  <div class="div"></div>
+  <div class="prefilled-banner" id="prefilled-banner">
+    This analysis has been prepared for <strong id="banner-address"></strong> by MOXI. Forest areas and ETS region are pre-filled from your eligibility assessment. You can adjust assumptions to explore different scenarios.
+  </div>
+  <p class="sub">Add your forest areas below. Use the eye icon to show or hide individual areas from the projection.</p>
+
+  <div class="card">
+    <span class="lbl">Property details</span>
+    <div class="region-row">
+      <div class="ctrl-card">
+        <span class="ctrl-lbl">ETS region</span>
+        <select id="region">
+          <option value="Bay of Plenty">Bay of Plenty</option>
+          <option value="Waikato/Taupo">Waikato/Taupo</option>
+          <option value="Auckland">Auckland</option>
+          <option value="Gisborne">Gisborne</option>
+          <option value="Hawkes Bay/SNI">Hawkes Bay / Southern NI</option>
+          <option value="Nelson/Marlborough">Nelson / Marlborough</option>
+          <option value="Canterbury/West Coast">Canterbury / West Coast</option>
+          <option value="Otago">Otago</option>
+          <option value="Southland">Southland</option>
+        </select>
+      </div>
+      <div class="ctrl-card" style="display:flex;align-items:center;">
+        <p style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Your ETS region is shown in your MOXI eligibility report. ETS regions don't follow standard regional boundaries.</p>
+      </div>
+    </div>
+    <span class="lbl">Forest areas</span>
+    <div class="inp-hdr">
+      <span>Species</span><span>Area (ha)</span><span>Est. year</span><span class="center">Show</span><span></span>
+    </div>
+    <div id="rows"></div>
+    <button class="btn-add" id="btn-add">+ Add forest area</button>
+  </div>
+
+  <div class="card">
+    <span class="lbl">Assumptions</span>
+    <div class="ctrl-row">
+      <div class="ctrl-card"><span class="ctrl-lbl">Base NZU price ($)</span><input type="number" id="nzu" value="50.25" min="10" max="200" step="0.25"></div>
+      <div class="ctrl-card"><span class="ctrl-lbl">Registration ($)</span><input type="number" id="reg" value="8000" min="0" step="500"></div>
+      <div class="ctrl-card"><span class="ctrl-lbl">Management ($/yr)</span><input type="number" id="mgmt" value="1500" min="0" step="50"></div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="legend">
+      <span><span class="lsq" style="background:#CFAF50"></span>Balanced (2% pa)</span>
+      <span><span class="lsq" style="background:rgba(207,175,80,0.4);border:1px dashed #CFAF50"></span>Pessimistic (flat)</span>
+      <span><span class="lsq" style="background:#5DCAA5"></span>Optimistic (3% pa)</span>
+    </div>
+    <p class="sec">Annual net earnings — balanced scenario</p>
+    <div class="chart-wrap" style="height:240px;margin-bottom:4px;"><canvas id="c-ann" role="img" aria-label="Annual net earnings balanced scenario">Annual net earnings</canvas></div>
+    <p class="sec">Cumulative net earnings — all scenarios</p>
+    <div class="chart-wrap" style="height:200px;margin-bottom:4px;"><canvas id="c-cum" role="img" aria-label="Cumulative net earnings three scenarios">Cumulative net earnings</canvas></div>
+    <p class="sec">Investment analysis</p>
+    <div class="inv-tbl-wrap" id="inv-tbl-wrap"></div>
+    <div class="export-row">
+      <button class="btn-export btn-csv" id="btn-csv">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="#5DCAA5" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Download CSV
+      </button>
+      <button class="btn-export btn-pdf" id="btn-pdf">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="#CFAF50" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Download PDF
+      </button>
+    </div>
+    <p class="disclaim">MPI ETS standard carbon lookup tables. NZU base price $50.25 (12-month VWA, EMS Tradepoint, May 2025–Apr 2026). MPI registration fee is area-based. MPI annual levy $14.90/ha from year 1 (not charged in registration year). MPI levy waived for native/indigenous forest under 6 years of age. Estimates are indicative only and subject to NZU price fluctuations.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function(){
+const CY=2026;
+const CATS=['Indigenous ETS Forest','Exotic Hardwoods ETS Forest','Exotic Softwoods ETS Forest','Pinus Radiata ETS Forest','Redwood ETS Forest'];
+const MPI_TIERS=[[10,488.89],[50,1815],[100,1980],[500,2640],[99999,4125]];
+function mpiReg(ha){for(const[k,v]of MPI_TIERS){if(ha<k)return v;}return 4125;}
+
+const EYE_ON=`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="#CFAF50" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" stroke="#CFAF50" stroke-width="1.3"/></svg>`;
+const EYE_OFF=`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="rgba(255,255,255,0.2)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" stroke="rgba(255,255,255,0.2)" stroke-width="1.3"/><line x1="2" y1="2" x2="14" y2="14" stroke="rgba(255,255,255,0.2)" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+
+const DELTA={
+  'Indigenous ETS Forest':[0,0.6,0.6,1.3,2.1,3.2,4.3,5.4,6.5,7.6,8.6,9.6,10.5,11.2,11.8,12.2,12.6,12.7,12.8,12.7,12.4,12.2,11.7,11.3,10.8,10.3,9.6,9.1,8.5,7.9,7.4,6.8,6.3,5.7,5.3,4.9,4.4,4.1,3.7,3.3,3.1,2.7,2.6,2.2,2.1,1.8,1.7],
+  'Exotic Hardwoods ETS Forest':[0,0.3,1.7,5,17,27,28,35,39,42,43,45,46,26,25,26,26,26,25,22,27,30,32,35,35,36,37,37,36,37,36,35,35,35,34,33,32,32,31,30,30,28,28,27,26,26,25],
+  'Exotic Softwoods ETS Forest':[0,0.2,0.8,2,9,14,19,18,14,10,8,11,12,14,15,16,17,17,17,18,17,17,17,16,16,15,14,15,14,14,13,14,13,13,12,13,12,12,12,11,12,12,11,12,11,12,11],
+  'Redwood ETS Forest':[0,0,0.1,0.9,0,2,7,12,17,21,26,28,16,18,20,23,24,26,28,29,31,32,34,35,35,37,38,39,40,41,41,43,43,43,44,45,45,45,46,47,46,48,47,48,48,48,49],
+  'Pinus Radiata ETS Forest':{
+    'Bay of Plenty':[0,0.4,1.6,4,18,27,33,34,25,12,14,19,24,27,30,31,33,34,34,34,33,33,32,31,29,29,28,27,27,26,25,25,24,24,23,22,23,21,21,21,21,21,20,21,20,20,21],
+    'Waikato/Taupo':[0,0.4,2.6,4,18,25,34,27,19,12,21,25,30,31,34,35,36,37,37,36,36,36,34,33,33,30,30,30,29,28,28,27,27,26,25,25,24,25,23,24,23,23,23,24,23,23,23],
+    'Auckland':[0,0.5,2.5,5,21,30,39,33,22,13,22,29,32,34,37,37,39,39,38,38,38,36,35,33,32,30,30,28,28,27,27,25,25,25,24,23,23,22,22,22,22,22,22,22,22,22,22],
+    'Gisborne':[0,0.6,3.4,6,27,40,44,41,28,11,18,23,28,32,34,36,38,37,38,37,36,36,34,33,31,30,29,28,28,27,27,25,26,25,24,24,24,23,23,24,23,23,23,24,24,24,24],
+    'Hawkes Bay/SNI':[0,0.5,2.5,6,25,37,42,42,30,12,13,23,27,31,34,36,37,38,37,37,37,35,35,33,31,31,29,28,28,28,27,26,25,26,24,25,24,24,24,23,24,24,23,24,24,25,25],
+    'Nelson/Marlborough':[0,0.2,0.8,2,9,16,20,25,27,17,15,12,17,21,24,26,28,30,32,31,33,32,32,32,31,30,30,30,29,29,29,28,27,27,27,26,25,25,25,24,23,24,23,22,23,22,22],
+    'Canterbury/West Coast':[0,0.2,0.8,1,3,10,16,22,23,25,24,14,11,8,12,16,19,21,23,25,26,26,27,27,28,27,26,27,27,27,27,26,26,26,25,25,25,24,24,23,23,23,22,22,22,21,21],
+    'Otago':[0,0.3,1.7,3,4,17,23,23,22,30,17,5,10,16,20,22,26,28,30,31,32,33,32,32,32,31,31,31,30,31,30,29,29,29,28,28,28,27,27,26,26,27,25,26,25,26,25],
+    'Southland':[0,0.2,0.8,2,11,21,30,34,35,26,14,7,17,21,25,28,30,32,33,34,34,35,34,34,33,33,31,32,31,31,31,30,30,29,29,28,28,28,27,27,27,27,27,26,26,27,26],
+  }
+};
+
+function getDelta(cat,region,age){
+  if(age<0)return 0;
+  let tbl=cat==='Pinus Radiata ETS Forest'?DELTA[cat][region]||DELTA[cat]['Bay of Plenty']:DELTA[cat];
+  if(!tbl)return 0;
+  return tbl[Math.min(Math.round(age),tbl.length-1)]||0;
+}
+function buildStockTable(f,region){
+  const rows=[];let cum=0;
+  for(let i=0;i<=25;i++){cum+=getDelta(f.cat,region,CY-f.yr+i);rows.push(cum*f.ha);}
+  return rows;
+}
+function nzuPrice(base,sc,i){
+  if(sc==='pes')return base;
+  if(sc==='bal')return base*Math.pow(1.02,i);
+  return base*Math.pow(1.03,i);
+}
+function fmtC(v){
+  if(v===0||v===null)return '-';
+  const a=Math.abs(Math.round(v));
+  return v<0?'($'+a.toLocaleString('en-NZ')+')':'$'+a.toLocaleString('en-NZ');
+}
+function fmtK(v){const a=Math.abs(v);return(v<0?'-':'')+'$'+(a>=1000?Math.round(a/1000)+'k':Math.round(a));}
+
+let forests=[{id:1,cat:'Indigenous ETS Forest',ha:10,yr:2010,on:true}];
+let nid=2,cc=null,ca=null,lastBal=null,lastPes=null,lastOpt=null,lastActive=[];
+let clientAddress='';
+
+// ── Load from hash if present ──────────────────────────────────────────
+function loadFromHash(){
+  const hash=window.location.hash.slice(1);
+  if(!hash)return;
+  try{
+    const json=JSON.parse(atob(hash));
+    if(json.address){
+      clientAddress=json.address;
+      const nameEl=document.getElementById('client-name');
+      nameEl.textContent=json.address;
+      nameEl.style.display='block';
+      document.getElementById('banner-address').textContent=json.address;
+      document.getElementById('prefilled-banner').style.display='block';
+      document.title='MOXI ETS — '+json.address;
+    }
+    if(json.region){
+      const sel=document.getElementById('region');
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].value===json.region){sel.selectedIndex=i;break;}
+      }
+    }
+    if(json.forests&&json.forests.length){
+      forests=json.forests.map((f,i)=>({id:i+1,cat:f.cat,ha:f.ha,yr:f.yr,on:true}));
+      nid=forests.length+1;
+    }
+    if(json.nzu)document.getElementById('nzu').value=json.nzu;
+    if(json.reg)document.getElementById('reg').value=json.reg;
+    if(json.mgmt)document.getElementById('mgmt').value=json.mgmt;
+  }catch(e){console.warn('Could not parse hash data',e);}
+}
+
+function renderRows(){
+  const el=document.getElementById('rows');
+  el.innerHTML=forests.map(f=>`
+    <div class="inp-row${f.on?'':' hidden-row'}" data-id="${f.id}">
+      <select class="fc" data-id="${f.id}">${CATS.map(c=>`<option value="${c}"${c===f.cat?' selected':''}>${c.replace(' ETS Forest','')}</option>`).join('')}</select>
+      <input type="number" class="fha" value="${f.ha}" min="0.1" max="999" step="0.1" data-id="${f.id}">
+      <input type="number" class="fyr" value="${f.yr}" min="1990" max="2025" step="1" data-id="${f.id}">
+      <button class="btn-eye ftog${f.on?'':' eye-off'}" data-id="${f.id}" title="${f.on?'Hide':'Show'}">${f.on?EYE_ON:EYE_OFF}</button>
+      <button class="btn-del fdel" data-id="${f.id}">×</button>
+    </div>`).join('');
+  el.querySelectorAll('.fc').forEach(e=>e.addEventListener('change',ev=>{forests.find(f=>f.id==ev.target.dataset.id).cat=ev.target.value;recalc();}));
+  el.querySelectorAll('.fha').forEach(e=>e.addEventListener('input',ev=>{forests.find(f=>f.id==ev.target.dataset.id).ha=parseFloat(ev.target.value)||0;recalc();}));
+  el.querySelectorAll('.fyr').forEach(e=>e.addEventListener('input',ev=>{forests.find(f=>f.id==ev.target.dataset.id).yr=parseInt(ev.target.value)||2000;recalc();}));
+  el.querySelectorAll('.ftog').forEach(e=>e.addEventListener('click',ev=>{
+    const btn=ev.currentTarget;
+    const f=forests.find(f=>f.id==btn.dataset.id);
+    f.on=!f.on;
+    btn.innerHTML=f.on?EYE_ON:EYE_OFF;
+    btn.classList.toggle('eye-off',!f.on);
+    btn.title=f.on?'Hide':'Show';
+    btn.closest('.inp-row').classList.toggle('hidden-row',!f.on);
+    recalc();
+  }));
+  el.querySelectorAll('.fdel').forEach(e=>e.addEventListener('click',ev=>{forests=forests.filter(f=>f.id!=ev.target.dataset.id);renderRows();recalc();}));
+}
+
+function calcMpiAnnual(year_i,active){
+  if(year_i===0)return 0;
+  return Math.round(active.reduce((s,f)=>{
+    const age=CY-f.yr+year_i;
+    if(f.cat==='Indigenous ETS Forest'&&age<6)return s;
+    return s+f.ha*14.9;
+  },0));
+}
+
+function calcProjection(sc,active){
+  const base=parseFloat(document.getElementById('nzu').value)||50.25;
+  const regMoxi=parseFloat(document.getElementById('reg').value)||8000;
+  const mgmt=parseFloat(document.getElementById('mgmt').value)||1500;
+  const region=document.getElementById('region').value;
+  const totalHa=active.reduce((s,f)=>s+f.ha,0);
+  const mpiR=mpiReg(totalHa);
+  const stockTables=active.map(f=>buildStockTable(f,region));
+  let prevStock=0,cum=0,rows=[];
+  for(let i=0;i<=25;i++){
+    const stock=stockTables.reduce((s,t)=>s+t[i],0);
+    const change=stock-prevStock;
+    const price=nzuPrice(base,sc,i);
+    const rev=i===0?0:Math.max(0,Math.round(change*price));
+    const regCost=i===0?regMoxi:0;
+    const mpiRegCost=i===0?mpiR:0;
+    const mpiAnn=calcMpiAnnual(i,active);
+    const mgmtCost=i===0?0:mgmt;
+    const totalCosts=-(regCost+mpiRegCost+mpiAnn+mgmtCost);
+    const net=Math.round(rev+totalCosts);
+    cum+=net;
+    rows.push({year:CY+i,stock:Math.round(stock*10)/10,change:Math.round(change*10)/10,price:Math.round(price*100)/100,rev,regCost,mpiRegCost,mpiAnn,mgmtCost,totalCosts:Math.round(totalCosts),net,cum:Math.round(cum)});
+    prevStock=stock;
+  }
+  return rows;
+}
+
+function irr(cashflows){
+  let rate=0.5;
+  for(let iter=0;iter<200;iter++){
+    let npv=0,dnpv=0;
+    cashflows.forEach((c,i)=>{const d=Math.pow(1+rate,i);npv+=c/d;dnpv-=i*c/Math.pow(1+rate,i+1);});
+    if(Math.abs(dnpv)<1e-12)break;
+    const nr=rate-npv/dnpv;
+    if(Math.abs(nr-rate)<1e-9){rate=nr;break;}
+    rate=Math.max(-0.99,nr);
+  }
+  return isFinite(rate)&&rate>-1?Math.round(rate*1000)/10:null;
+}
+
+function recalc(){
+  const active=forests.filter(f=>f.on&&f.ha>0);
+  lastActive=active;
+  if(active.length===0){
+    document.getElementById('stats').innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:12px 0;grid-column:span 5;">No forest areas visible. Click the eye icon to show at least one area.</div>';
+    document.getElementById('inv-tbl-wrap').innerHTML='';
+    if(cc)cc.destroy();if(ca)ca.destroy();cc=null;ca=null;
+    return;
+  }
+  const bal=calcProjection('bal',active);
+  const pes=calcProjection('pes',active);
+  const opt=calcProjection('opt',active);
+  lastBal=bal;lastPes=pes;lastOpt=opt;
+  const disp=bal.slice(1);
+  const years=disp.map(r=>r.year);
+  const bep=bal.findIndex((r,i)=>i>0&&r.cum>0);
+  const totalHa=active.reduce((s,f)=>s+f.ha,0);
+  const mpiR=mpiReg(totalHa);
+  const regTotal=(parseFloat(document.getElementById('reg').value)||8000)+mpiR;
+  const irrBal=irr(bal.map(r=>r.net));
+  const irrPes=irr(pes.map(r=>r.net));
+  const irrOpt=irr(opt.map(r=>r.net));
+
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="slbl">Active area</div><div class="snum">${Math.round(totalHa*10)/10} ha</div><div class="ssub">${active.length} of ${forests.length} area${forests.length!==1?'s':''}</div></div>
+    <div class="stat"><div class="slbl">Year 0 cost</div><div class="snum neg">${fmtC(-regTotal)}</div><div class="ssub">Reg + MPI fee</div></div>
+    <div class="stat"><div class="slbl">Breakeven</div><div class="snum">${bep>0?bal[bep].year:'—'}</div><div class="ssub">Cumulative positive</div></div>
+    <div class="stat"><div class="slbl">10-year total</div><div class="snum ${(bal[10]?.cum||0)>=0?'':'neg'}">${fmtC(bal[10]?.cum||0)}</div><div class="ssub">Balanced scenario</div></div>
+    <div class="stat"><div class="slbl">25-year total</div><div class="snum">${fmtC(bal[25]?.cum||0)}</div><div class="ssub">Balanced scenario</div></div>`;
+
+  if(cc)cc.destroy();if(ca)ca.destroy();
+
+  ca=new Chart(document.getElementById('c-ann'),{type:'bar',data:{labels:years,datasets:[{label:'Annual net',data:disp.map(r=>r.net),backgroundColor:disp.map(r=>r.net>=0?'rgba(207,175,80,0.75)':'rgba(216,90,48,0.75)'),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(10,20,16,0.97)',borderColor:'rgba(207,175,80,0.3)',borderWidth:1,titleColor:'rgba(255,255,255,0.9)',bodyColor:'rgba(255,255,255,0.6)',callbacks:{label:ctx=>'Net: '+fmtC(ctx.parsed.y)}}},scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10},maxRotation:45,autoSkip:false},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}}}}});
+
+  cc=new Chart(document.getElementById('c-cum'),{type:'line',data:{labels:years,datasets:[{label:'Optimistic',data:opt.slice(1).map(r=>r.cum),borderColor:'#5DCAA5',backgroundColor:'rgba(93,202,165,0.06)',fill:true,tension:0.35,pointRadius:0,borderWidth:1.5},{label:'Balanced',data:bal.slice(1).map(r=>r.cum),borderColor:'#CFAF50',backgroundColor:'rgba(207,175,80,0.08)',fill:true,tension:0.35,pointRadius:0,borderWidth:2},{label:'Pessimistic',data:pes.slice(1).map(r=>r.cum),borderColor:'rgba(207,175,80,0.4)',borderDash:[4,3],backgroundColor:'transparent',tension:0.35,pointRadius:0,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(10,20,16,0.97)',borderColor:'rgba(207,175,80,0.3)',borderWidth:1,titleColor:'rgba(255,255,255,0.9)',bodyColor:'rgba(255,255,255,0.5)',callbacks:{label:ctx=>ctx.dataset.label+': '+fmtC(ctx.parsed.y)}}},scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10},maxTicksLimit:7},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}}}}});
+
+  function scenRows(rows,label){
+    return `<tr class="section-hdr"><td colspan="${rows.length+1}">${label}</td></tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">NZU price projection</td>${rows.map(r=>`<td style="color:rgba(255,255,255,0.4);">$${r.price.toFixed(2)}</td>`).join('')}</tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">Annual carbon revenue</td>${rows.map(r=>`<td class="${r.rev>0?'pos':'zero'}">${fmtC(r.rev)}</td>`).join('')}</tr>
+      <tr class="net-row"><td>Net earnings</td>${rows.map(r=>`<td class="${r.net>0?'pos':r.net<0?'neg':'zero'}">${fmtC(r.net)}</td>`).join('')}</tr>
+      <tr class="cum-row"><td>Cumulative net earnings</td>${rows.map(r=>`<td class="${r.cum>0?'pos':r.cum<0?'neg':'zero'}">${fmtC(r.cum)}</td>`).join('')}</tr>
+      <tr class="spacer"><td colspan="${rows.length+1}"></td></tr>`;
+  }
+
+  const allYrs=[bal[0],...disp];
+  document.getElementById('inv-tbl-wrap').innerHTML=`
+    <table class="inv-tbl"><thead><tr>
+      <th>Investment analysis</th>${allYrs.map((r,i)=>`<th>Yr ${i}<br><span style="font-weight:400;font-size:9px;color:rgba(255,255,255,0.3)">${r.year}</span></th>`).join('')}
+    </tr></thead><tbody>
+      <tr class="section-hdr"><td colspan="${allYrs.length+1}">Carbon stock</td></tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">Total carbon stock (t)</td>${allYrs.map(r=>`<td style="color:rgba(255,255,255,0.45);">${r.stock.toLocaleString()}</td>`).join('')}</tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">Annual change (t)</td>${allYrs.map(r=>`<td style="color:rgba(255,255,255,0.35);">${r.change.toLocaleString()}</td>`).join('')}</tr>
+      <tr class="spacer"><td colspan="${allYrs.length+1}"></td></tr>
+      <tr class="section-hdr"><td colspan="${allYrs.length+1}">Costs</td></tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">Registration</td>${allYrs.map((r,i)=>`<td class="${i===0?'neg':'zero'}">${i===0?fmtC(-r.regCost):'-'}</td>`).join('')}</tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">MPI registration fee</td>${allYrs.map((r,i)=>`<td class="${i===0?'neg':'zero'}">${i===0?fmtC(-r.mpiRegCost):'-'}</td>`).join('')}</tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">MPI annual levy</td>${allYrs.map(r=>`<td class="${r.mpiAnn>0?'neg':'zero'}">${r.mpiAnn>0?fmtC(-r.mpiAnn):'-'}</td>`).join('')}</tr>
+      <tr><td style="padding-left:12px;font-size:10px;color:rgba(255,255,255,0.35);">Management</td>${allYrs.map((r,i)=>`<td class="${i>0?'neg':'zero'}">${i>0?fmtC(-r.mgmtCost):'-'}</td>`).join('')}</tr>
+      <tr class="total-row"><td>Total costs</td>${allYrs.map(r=>`<td class="neg">${fmtC(r.totalCosts)}</td>`).join('')}</tr>
+      <tr class="spacer"><td colspan="${allYrs.length+1}"></td></tr>
+      ${scenRows(allYrs.map((_,i)=>bal[i]),'Balanced scenario')}
+      ${scenRows(allYrs.map((_,i)=>pes[i]),'Pessimistic scenario')}
+      ${scenRows(allYrs.map((_,i)=>opt[i]),'Optimistic scenario')}
+    </tbody></table>
+    <div class="itr-row">
+      <div class="itr-card"><div class="itr-lbl">Balanced — IRR</div><div class="itr-val">${irrBal!==null?irrBal+'%':'—'}</div></div>
+      <div class="itr-card"><div class="itr-lbl">Pessimistic — IRR</div><div class="itr-val">${irrPes!==null?irrPes+'%':'—'}</div></div>
+      <div class="itr-card"><div class="itr-lbl">Optimistic — IRR</div><div class="itr-val">${irrOpt!==null?irrOpt+'%':'—'}</div></div>
+    </div>`;
+}
+
+function downloadCSV(){
+  if(!lastBal)return;
+  const region=document.getElementById('region').value;
+  const lines=['MOXI ETS Investment Analysis'];
+  if(clientAddress)lines.push(`Property,${clientAddress}`);
+  lines.push(`ETS Region,${region}`,`Generated,${new Date().toLocaleDateString('en-NZ')}`,'','Forest Areas','Species,Area (ha),Est. Year,Shown');
+  forests.forEach(f=>lines.push(`"${f.cat}",${f.ha},${f.yr},${f.on?'Yes':'No'}`));
+  lines.push('');
+  lines.push(['','Year 0',...lastBal.slice(1).map(r=>r.year)].join(','));
+  function addRow(label,vals){lines.push([`"${label}"`,...vals.map(v=>Math.round(v)===0?'-':Math.round(v))].join(','));}
+  lines.push('Carbon Stock');
+  addRow('Total carbon stock (t)',lastBal.map(r=>r.stock));
+  addRow('Annual change (t)',lastBal.map(r=>r.change));
+  lines.push('','Costs');
+  addRow('Registration',lastBal.map((r,i)=>i===0?-r.regCost:0));
+  addRow('MPI registration fee',lastBal.map((r,i)=>i===0?-r.mpiRegCost:0));
+  addRow('MPI annual levy',lastBal.map(r=>-r.mpiAnn));
+  addRow('Management',lastBal.map((r,i)=>i===0?0:-r.mgmtCost));
+  addRow('Total costs',lastBal.map(r=>r.totalCosts));
+  lines.push('','Balanced Scenario');
+  addRow('NZU price',lastBal.map(r=>r.price));
+  addRow('Annual carbon revenue',lastBal.map(r=>r.rev));
+  addRow('Net earnings',lastBal.map(r=>r.net));
+  addRow('Cumulative net earnings',lastBal.map(r=>r.cum));
+  lines.push('','Pessimistic Scenario');
+  addRow('Net earnings',lastPes.map(r=>r.net));
+  addRow('Cumulative net earnings',lastPes.map(r=>r.cum));
+  lines.push('','Optimistic Scenario');
+  addRow('Net earnings',lastOpt.map(r=>r.net));
+  addRow('Cumulative net earnings',lastOpt.map(r=>r.cum));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download=`MOXI_ETS_${clientAddress||'Investment'}_Analysis.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+function downloadPDF(){
+  if(!lastBal)return;
+  const region=document.getElementById('region').value;
+  const nzu=document.getElementById('nzu').value;
+  const reg=document.getElementById('reg').value;
+  const mgmt=document.getElementById('mgmt').value;
+  const annImg=document.getElementById('c-ann').toDataURL('image/png');
+  const cumImg=document.getElementById('c-cum').toDataURL('image/png');
+  const totalHa=lastActive.reduce((s,f)=>s+f.ha,0);
+  const irrBal=irr(lastBal.map(r=>r.net));
+  const irrPes=irr(lastPes.map(r=>r.net));
+  const irrOpt=irr(lastOpt.map(r=>r.net));
+  const allYrs=[lastBal[0],...lastBal.slice(1)];
+  function fC(v){if(v===0)return'-';const a=Math.abs(Math.round(v));return v<0?'($'+a.toLocaleString()+')':`$${a.toLocaleString()}`;}
+  function tr(lbl,vals,cls=''){return`<tr class="${cls}"><td class="rl">${lbl}</td>${vals.map(v=>{const n=Math.round(v);return`<td class="${n>0?'p':n<0?'n':'z'}">${fC(v)}</td>`;}).join('')}</tr>`;}
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>MOXI ETS — ${clientAddress||'Investment Analysis'}</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&family=Lato:wght@400;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Lato',sans-serif;background:#0f1a16;color:#fff;padding:36px;}
+  .tag{font-family:'Raleway',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:#CFAF50;display:block;margin-bottom:8px;}
+  h1{font-family:'Raleway',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;}
+  .addr{font-family:'Raleway',sans-serif;font-size:14px;font-weight:700;color:#CFAF50;margin-bottom:6px;}
+  .bar{width:40px;height:3px;background:#CFAF50;margin-bottom:14px;}
+  .meta{font-size:11px;color:rgba(255,255,255,0.4);display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;}.meta strong{color:#CFAF50;}
+  .stl{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:20px 0 8px;}
+  .forest-t{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:20px;}
+  .forest-t th{padding:5px 8px;text-align:left;background:rgba(207,175,80,0.1);color:rgba(255,255,255,0.4);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid rgba(207,175,80,0.25);}
+  .forest-t td{padding:4px 8px;color:rgba(255,255,255,0.7);border-bottom:0.5px solid rgba(255,255,255,0.05);}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .cbox{background:rgba(255,255,255,0.02);border:0.5px solid rgba(207,175,80,0.15);border-radius:6px;padding:14px;}
+  .cbox img{width:100%;}.clbl{font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+  table.i{border-collapse:collapse;width:100%;font-size:10px;}
+  table.i th{padding:4px 6px;text-align:right;background:rgba(207,175,80,0.08);color:rgba(255,255,255,0.4);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid rgba(207,175,80,0.3);white-space:nowrap;}
+  table.i th:first-child{text-align:left;min-width:140px;}
+  table.i td{padding:3px 6px;text-align:right;border-bottom:0.5px solid rgba(255,255,255,0.04);white-space:nowrap;}
+  table.i .rl{text-align:left;color:rgba(255,255,255,0.6);font-size:9px;}
+  table.i .p{color:#CFAF50;}table.i .n{color:#D85A30;}table.i .z{color:rgba(255,255,255,0.2);}
+  table.i tr.sh td{background:rgba(207,175,80,0.08);color:rgba(255,255,255,0.55);font-weight:700;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border-top:1px solid rgba(207,175,80,0.2);}
+  table.i tr.tot td{background:rgba(207,175,80,0.05);font-weight:700;border-top:1px solid rgba(207,175,80,0.2);border-bottom:1px solid rgba(207,175,80,0.2);}
+  table.i tr.bld td{font-weight:700;}table.i tr.sp td{height:5px;background:transparent;border:none;}
+  .irrs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;}
+  .irc{background:rgba(207,175,80,0.06);border:0.5px solid rgba(207,175,80,0.2);border-radius:4px;padding:10px 14px;}
+  .irl{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+  .irv{font-size:15px;font-weight:800;font-family:'Raleway',sans-serif;color:#CFAF50;}
+  .disc{font-size:10px;color:rgba(255,255,255,0.2);margin-top:18px;line-height:1.7;}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head><body>
+  <span class="tag">ETS investment analysis</span>
+  ${clientAddress?`<div class="addr">${clientAddress}</div>`:''}
+  <h1>Carbon returns projection</h1><div class="bar"></div>
+  <div class="meta">
+    <span>ETS Region: <strong>${region}</strong></span>
+    <span>Active area: <strong>${Math.round(totalHa*10)/10} ha</strong></span>
+    <span>Base NZU: <strong>$${nzu}</strong></span>
+    <span>Generated: ${new Date().toLocaleDateString('en-NZ')}</span>
+  </div>
+  <div class="stl">Forest areas</div>
+  <table class="forest-t"><thead><tr><th>Species</th><th>Area (ha)</th><th>Est. year</th><th>Age in ${CY}</th></tr></thead>
+  <tbody>${lastActive.map(f=>`<tr><td>${f.cat.replace(' ETS Forest','')}</td><td>${f.ha}</td><td>${f.yr}</td><td>${CY-f.yr} years</td></tr>`).join('')}</tbody></table>
+  <div class="charts">
+    <div class="cbox"><div class="clbl">Annual net earnings — balanced</div><img src="${annImg}"></div>
+    <div class="cbox"><div class="clbl">Cumulative net earnings — all scenarios</div><img src="${cumImg}"></div>
+  </div>
+  <table class="i"><thead><tr><th>Investment analysis</th>${allYrs.map((r,i)=>`<th>Yr ${i}<br><span style="font-weight:400;font-size:8px">${r.year}</span></th>`).join('')}</tr></thead>
+  <tbody>
+    <tr class="sh"><td colspan="${allYrs.length+1}">Carbon stock</td></tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">Total carbon stock (t)</td>${allYrs.map(r=>`<td class="z">${r.stock.toLocaleString()}</td>`).join('')}</tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">Annual change (t)</td>${allYrs.map(r=>`<td class="z">${r.change.toLocaleString()}</td>`).join('')}</tr>
+    <tr class="sp"><td colspan="${allYrs.length+1}"></td></tr>
+    <tr class="sh"><td colspan="${allYrs.length+1}">Costs</td></tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">Registration</td>${allYrs.map((r,i)=>`<td class="${i===0?'n':'z'}">${i===0?fC(-r.regCost):'-'}</td>`).join('')}</tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">MPI registration fee</td>${allYrs.map((r,i)=>`<td class="${i===0?'n':'z'}">${i===0?fC(-r.mpiRegCost):'-'}</td>`).join('')}</tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">MPI annual levy</td>${allYrs.map(r=>`<td class="${r.mpiAnn>0?'n':'z'}">${r.mpiAnn>0?fC(-r.mpiAnn):'-'}</td>`).join('')}</tr>
+    <tr><td style="padding-left:8px;font-size:9px;color:rgba(255,255,255,0.35);">Management</td>${allYrs.map((r,i)=>`<td class="${i>0?'n':'z'}">${i>0?fC(-r.mgmtCost):'-'}</td>`).join('')}</tr>
+    <tr class="tot"><td class="rl">Total costs</td>${allYrs.map(r=>`<td class="n">${fC(r.totalCosts)}</td>`).join('')}</tr>
+    <tr class="sp"><td colspan="${allYrs.length+1}"></td></tr>
+    <tr class="sh"><td colspan="${allYrs.length+1}">Balanced scenario (2% pa NZU growth)</td></tr>
+    ${tr('Annual carbon revenue',lastBal.map(r=>r.rev))}${tr('Net earnings',lastBal.map(r=>r.net),'bld')}${tr('Cumulative net earnings',lastBal.map(r=>r.cum),'bld')}
+    <tr class="sp"><td colspan="${allYrs.length+1}"></td></tr>
+    <tr class="sh"><td colspan="${allYrs.length+1}">Pessimistic scenario (flat NZU price)</td></tr>
+    ${tr('Net earnings',lastPes.map(r=>r.net),'bld')}${tr('Cumulative net earnings',lastPes.map(r=>r.cum),'bld')}
+    <tr class="sp"><td colspan="${allYrs.length+1}"></td></tr>
+    <tr class="sh"><td colspan="${allYrs.length+1}">Optimistic scenario (3% pa NZU growth)</td></tr>
+    ${tr('Net earnings',lastOpt.map(r=>r.net),'bld')}${tr('Cumulative net earnings',lastOpt.map(r=>r.cum),'bld')}
+  </tbody></table>
+  <div class="irrs">
+    <div class="irc"><div class="irl">Balanced — IRR</div><div class="irv">${irrBal!==null?irrBal+'%':'—'}</div></div>
+    <div class="irc"><div class="irl">Pessimistic — IRR</div><div class="irv">${irrPes!==null?irrPes+'%':'—'}</div></div>
+    <div class="irc"><div class="irl">Optimistic — IRR</div><div class="irv">${irrOpt!==null?irrOpt+'%':'—'}</div></div>
+  </div>
+  <p class="disc">MPI ETS standard carbon lookup tables. Base NZU $${nzu}. Registration: $${reg} MOXI fee + area-based MPI fee. Management $${mgmt}/yr. MPI annual levy $14.90/ha from year 1 (waived for indigenous forest under 6 years). Estimates indicative only.</p>
+  <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`;
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+}
+
+document.getElementById('btn-add').addEventListener('click',()=>{forests.push({id:nid++,cat:'Indigenous ETS Forest',ha:5,yr:2015,on:true});renderRows();recalc();});
+document.getElementById('region').addEventListener('change',recalc);
+document.getElementById('btn-csv').addEventListener('click',downloadCSV);
+document.getElementById('btn-pdf').addEventListener('click',downloadPDF);
+['nzu','reg','mgmt'].forEach(id=>document.getElementById(id).addEventListener('input',recalc));
+
+loadFromHash();
+renderRows();
+recalc();
+})();
+</script>
+</body>
+</html>
